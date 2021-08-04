@@ -1,0 +1,42 @@
+﻿@page "/exportacionMapa"
+@inject IDataAccess _data
+@inject IConfiguration _config
+
+
+
+<h2 class="text-center">Mapa de Casos</h2>
+
+<RadzenGoogleMap Zoom="8" Style="height: 600px;" Center="@( new GoogleMapPosition() {Lat=18.7781827,Lng=-67.5857832})">
+
+    <Markers>
+        @foreach (var i in lst_reportes)
+        {
+
+            <RadzenGoogleMapMarker Title="Reporte Actual" Label="@i.Nombre" Position="@(new GoogleMapPosition() {Lat= Convert.ToDouble(i.Latitud), Lng= Convert.ToDouble( i.Longitud)})" />
+
+        }
+
+
+    </Markers>
+
+
+</RadzenGoogleMap>
+
+
+
+
+
+
+@code {
+
+    List<dynamic> lst_reportes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var query = "SELECT Nombre , Latitud, Longitud FROM ROBOS_PERSONA";
+        lst_reportes = await _data.LoadData<dynamic, dynamic>(query, new { }, _config.GetConnectionString("default"));
+
+
+    }
+
+}

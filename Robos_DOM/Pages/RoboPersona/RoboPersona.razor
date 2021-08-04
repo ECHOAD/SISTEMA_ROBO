@@ -1,0 +1,154 @@
+﻿@page "/reportes_robos"
+@page "/"
+@using Radzen.Blazor
+@inherits PersonaRoboBase
+
+<div class=container-fluid>
+
+    <div class="row">
+
+        <div class="col-12">
+            <h4>Reportar Robo</h4>
+        </div>
+
+        <div class="col-12">
+            <EditForm Model="OPersona" class="form-row" OnValidSubmit="@(ModoEditar==true ? UpdateData: SaveData)">
+                <DataAnnotationsValidator/>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-12 col-lg-6">
+                            <div class="form-row">
+                                <div class="form-group col-12">
+
+                                    <label class="col-form-label">Cedula</label>
+                                    <InputText class="form-control" @bind-Value="OPersona.Cedula" />
+                                </div>
+                                <div class="form-group col-sm-12 col-lg-6">
+
+                                    <label class="col-form-label">Nombre</label>
+                                    <InputText class="form-control" @bind-Value="OPersona.Nombre" />
+                                </div>
+                                <div class="form-group col-sm-12 col-lg-6">
+
+                                    <label class="col-form-label">Apellido</label>
+                                    <InputText class="form-control" @bind-Value="OPersona.Apellido" />
+                                </div>
+
+                                <div class="form-group col-sm-12 col-lg-6">
+
+                                    <label class="col-form-label">Fecha del Suceso</label>
+
+                                    <input type="date" format="mm/dd/yyyy" class="form-control" @bind="OPersona.Fecha" />
+                                </div>
+                                <div class="form-group col-sm-12 col-lg-6">
+
+                                    <label class="col-form-label">Costo</label>
+                                    <InputNumber class="form-control" min="0.01" @bind-Value="OPersona.Valor" />
+                                </div>
+                                <div class="form-group col-12">
+
+                                    <label class="col-form-label">Descripcion</label>
+                                    <RadzenTextArea @bind-Value="OPersona.Descripcion" class=form-control Style="resize:none" />
+                                </div>
+                                <div class="form-group col-12">
+
+                                    <label class="col-form-label">Direccion</label>
+                                    <input type="text" @bind=" OPersona.Direccion" class="form-control" />
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="col-sm-12 col-lg-6">
+                            <RadzenGoogleMap Zoom="zoomMap" MapClick="MapClick" Center="@(new GoogleMapPosition() {Lat=OPersona.Latitud, Lng=OPersona.Longitud})">
+
+                                <Markers>
+
+
+                                       <RadzenGoogleMapMarker Title="Reporte Actual" Label="Reporte Actual" Position="@(new GoogleMapPosition() {Lat=OPersona.Latitud, Lng=OPersona.Longitud})" />
+
+
+
+
+                                </Markers>
+
+
+                            </RadzenGoogleMap>
+
+
+
+                        </div>
+
+
+                    </div>
+                    <div class="form-action text-center">
+                        <div class=" col-12 form-action mt-2 p-2">
+                            <button type="submit" class="btn btn-primary col-12 ">@(ModoEditar==true ? "Editar Reporte":"Agregar Reporte")</button>
+                        </div>
+                        <div class=" col-12 form-action mt-2 p-2">
+                            <button type="reset" class="btn btn-danger col-12 " disabled="@(ModoEditar==true ? true:false)">Limpiar Reporte</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </EditForm>
+
+        </div>
+
+        <div class="col-12 mt-4">
+
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" PageSize="5" AllowPaging="true" TItem="PersonaRoboModel" Data="lst_reportes">
+                <Columns>
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Id" Filterable="true" Title="Id" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Cedula" Filterable="true" Title="Cedula" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Nombre" Filterable="true" Title="Nombre" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Descripcion" Filterable="false" Title="Descripcion" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Valor" Filterable="false" Title="Valor" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Fecha" Filterable="false" Title="Fecha" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Direccion" Filterable="false" Title="Direccion" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Latitud" Filterable="false" Title="Latitud" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Property="Longitud" Filterable="false" Title="Longitud" Width="50px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="PersonaRoboModel" Context="RoboPersona" Title="Acciones" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+                        <Template Context="Reporte">
+                            <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="edit" Size="ButtonSize.Medium" Click="()=>LoadEditar(Reporte.Id)" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="print" Size="ButtonSize.Medium" Click="()=>ExportarDato(Reporte.Id)" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+
+    int zoomMap = 5;
+    bool showMarkedMap = false;
+
+
+
+    void MapClick(GoogleMapClickEventArgs args)
+    {
+        OPersona.Latitud = args.Position.Lat;
+        OPersona.Longitud = args.Position.Lng;
+        zoomMap = 8;
+        showMarkedMap = true;
+
+
+    }
+
+
+
+
+
+
+}
